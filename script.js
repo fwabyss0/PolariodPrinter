@@ -220,16 +220,16 @@ function calculateLayout() {
 }
 
 function render() {
-    const paper = getPaperDimensions();
+    const paperDims = getPaperDimensions();
     const format = getCurrentFormat();
     const margin = getMargins();
     const spacing = getSpacing();
     const layout = calculateLayout();
 
-    layoutInfo.textContent = `${paper.name} ${paperOrientation === 'landscape' ? 'Landscape' : 'Portrait'} — ${layout.columns} × ${layout.rows} — ${layout.count} polaroids`;
+    layoutInfo.textContent = `${paperDims.name} ${paperOrientation === 'landscape' ? 'Landscape' : 'Portrait'} — ${layout.columns} × ${layout.rows} — ${layout.count} polaroids`;
 
-    paper.style.width = paper.width + 'cm';
-    paper.style.height = paper.height + 'cm';
+    paper.style.width = paperDims.width + 'cm';
+    paper.style.height = paperDims.height + 'cm';
     paper.style.background = getBgColor();
     paper.style.padding = '0';
 

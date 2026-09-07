@@ -1,144 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Print Village - Photo Polaroid Printer</title>
+    <title>Polaroid Printer</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div class="app">
-        <header class="app-header">
-            <div class="brand">
-                <h1>📷 Print Village</h1>
-                <p>Print your memories</p>
+
+    <header>
+        <h1>Polaroid Printer</h1>
+        <p>Turn your photos into printable Polaroid sheets.</p>
+    </header>
+
+    <main>
+
+        <section class="controls">
+
+            <div class="control-group">
+                <label>Paper Size</label>
+
+                <select id="paperSize">
+                    <option value="a4">A4 — 21 × 29.7 cm</option>
+                    <option value="a3">A3 — 29.7 × 42 cm</option>
+                    <option value="12x18">12 × 18 inch — 30.48 × 45.72 cm</option>
+                </select>
             </div>
-            <div class="header-actions">
-                <button id="saveBtn" class="secondary">💾 Save Layout</button>
-                <button id="printBtn" class="primary">🖨 Print</button>
+
+            <div class="control-group">
+                <label>Polaroids Per Photo</label>
+
+                <input type="number" id="copies" value="1" min="1" max="100">
             </div>
-        </header>
 
-        <aside class="sidebar sidebar-settings">
-            <section class="panel">
-                <h3>Paper</h3>
-                <div class="control-group">
-                    <label>Paper Size</label>
-                    <select id="paperSize">
-                        <optgroup label="Standard">
-                            <option value="a4">A4 — 21 × 29.7 cm</option>
-                            <option value="a3">A3 — 29.7 × 42 cm</option>
-                            <option value="a5">A5 — 14.8 × 21 cm</option>
-                            <option value="a6">A6 — 10.5 × 14.8 cm</option>
-                            <option value="a2">A2 — 42 × 59.4 cm</option>
-                            <option value="a1">A1 — 59.4 × 84.1 cm</option>
-                            <option value="a0">A0 — 84.1 × 118.9 cm</option>
-                        </optgroup>
-                        <optgroup label="Office">
-                            <option value="letter">Letter — 21.59 × 27.94 cm</option>
-                            <option value="legal">Legal — 21.59 × 35.56 cm</option>
-                            <option value="tabloid">Tabloid — 27.94 × 43.18 cm</option>
-                        </optgroup>
-                        <optgroup label="Photo / Print">
-                            <option value="11x17">11 × 17 inch — 27.94 × 43.18 cm</option>
-                            <option value="12x18">12 × 18 inch — 30.48 × 45.72 cm</option>
-                            <option value="13x19">13 × 19 inch — 33.02 × 48.26 cm</option>
-                        </optgroup>
-                        <optgroup label="Custom">
-                            <option value="custom">Custom Size</option>
-                        </optgroup>
-                    </select>
-                </div>
-                <div class="control-group" id="customSizeGroup" style="display:none;">
-                    <label>Width</label>
-                    <input type="number" id="customWidth" value="21" min="1" max="200" step="0.1">
-                    <label>Height</label>
-                    <input type="number" id="customHeight" value="29.7" min="1" max="200" step="0.1">
-                    <label>Unit</label>
-                    <select id="customUnit">
-                        <option value="mm">mm</option>
-                        <option value="cm" selected>cm</option>
-                        <option value="inch">inch</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>Paper Orientation</label>
-                    <div class="toggle-group">
-                        <button class="toggle-btn active" data-value="portrait" id="paperPortraitBtn">Portrait</button>
-                        <button class="toggle-btn" data-value="landscape" id="paperLandscapeBtn">Landscape</button>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label>Polaroid Orientation</label>
-                    <div class="toggle-group">
-                        <button class="toggle-btn active" data-value="portrait" id="polaroidPortraitBtn">Portrait</button>
-                        <button class="toggle-btn" data-value="landscape" id="polaroidLandscapeBtn">Landscape</button>
-                    </div>
-                </div>
-            </section>
+            <div class="control-group">
+                <label>Spacing</label>
 
-            <section class="panel">
-                <h3>Layout</h3>
-                <div class="control-group">
-                    <label>Spacing</label>
-                    <select id="spacing">
-                        <option value="0">0 cm</option>
-                        <option value="0.2">0.2 cm</option>
-                        <option value="0.3" selected>0.3 cm</option>
-                        <option value="0.5">0.5 cm</option>
-                        <option value="1">1 cm</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>
-                        <input type="checkbox" id="uniformMargin" checked>
-                        Uniform Margin
-                    </label>
-                </div>
-                <div class="control-group" id="uniformMarginGroup">
-                    <label>Margin</label>
-                    <select id="uniformMarginValue">
-                        <option value="0">0 cm</option>
-                        <option value="0.2">0.2 cm</option>
-                        <option value="0.5" selected>0.5 cm</option>
-                        <option value="1">1 cm</option>
-                        <option value="2">2 cm</option>
-                    </select>
-                </div>
-                <div class="control-group" id="advancedMarginGroup" style="display:none;">
-                    <div class="margin-grid">
-                        <div>
-                            <label>Top</label>
-                            <input type="number" id="marginTop" value="0.5" min="0" max="5" step="0.1">
-                        </div>
-                        <div>
-                            <label>Bottom</label>
-                            <input type="number" id="marginBottom" value="0.5" min="0" max="5" step="0.1">
-                        </div>
-                        <div>
-                            <label>Left</label>
-                            <input type="number" id="marginLeft" value="0.5" min="0" max="5" step="0.1">
-                        </div>
-                        <div>
-                            <label>Right</label>
-                            <input type="number" id="marginRight" value="0.5" min="0" max="5" step="0.1">
-                        </div>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label>
-                        <input type="checkbox" id="cutMarks">
-                        Cut Marks
-                    </label>
-                </div>
-            </section>
+                <input type="number" id="spacing" value="0.3" min="0" max="3" step="0.1">
 
-            <section class="panel">
-                <h3>Style</h3>
-                <div class="control-group">
-                    <label>Background Color</label>
+                <span>cm</span>
+            </div>
+
+            <div class="control-group">
+                <label>Orientation</label>
+
+                <select id="orientation">
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Landscape</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Background Color</label>
+
+                <div class="color-controls">
                     <input type="color" id="bgColor" value="#ffffff">
-                    <div class="presets">
+
+                    <div class="color-presets">
                         <button class="preset" data-color="#ffffff" title="White">White</button>
                         <button class="preset" data-color="#f5f0e6" title="Cream">Cream</button>
                         <button class="preset" data-color="#000000" title="Black">Black</button>
@@ -146,153 +66,107 @@
                         <button class="preset" data-color="#e3f2fd" title="Light blue">Blue</button>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <section class="panel">
-                <h3>Text</h3>
-                <div class="control-group">
-                    <label>
-                        <input type="checkbox" id="applyTextToAll">
-                        Apply same text to all photos
-                    </label>
-                </div>
-                <div class="control-group">
-                    <label>Text</label>
-                    <input type="text" id="polaroidText" placeholder="Enter text...">
-                </div>
-                <div class="control-group">
-                    <label>Font Size</label>
-                    <input type="number" id="fontSize" value="16" min="8" max="72" step="1">
-                </div>
-                <div class="control-group">
-                    <label>Font</label>
-                    <select id="fontFamily">
-                        <option value="Arial">Arial</option>
-                        <option value="Helvetica">Helvetica</option>
-                        <option value="Times New Roman">Times New Roman</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="Courier New">Courier New</option>
-                        <option value="Verdana">Verdana</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>Alignment</label>
-                    <select id="textAlign">
-                        <option value="center" selected>Center</option>
-                        <option value="left">Left</option>
-                        <option value="right">Right</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>Text Color</label>
-                    <input type="color" id="textColor" value="#000000">
-                </div>
-            </section>
-        </aside>
+            <div class="buttons">
+                <label class="upload-btn">
+                    📷 Upload Photos
+                    <input type="file" id="photoInput" accept="image/*" multiple hidden>
+                </label>
 
-        <main class="main">
-            <section class="panel photos-panel">
-                <h3>Uploaded Photos</h3>
-                <div class="upload-area" id="dropZone">
-                    <label class="upload-btn">
-                        📷 Add Photos
-                        <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp" multiple hidden>
-                    </label>
-                    <p class="hint">Drag & drop or click to upload<br>JPG, PNG, WEBP</p>
-                </div>
-                <div id="photoList"></div>
-            </section>
-        </main>
+                <button id="clearBtn">
+                    Clear
+                </button>
 
-        <aside class="sidebar sidebar-preview">
+                <button id="printBtn">
+                    🖨 Print
+                </button>
+            </div>
+
+        </section>
+
+
+        <section class="info">
+
+            <div>
+                <strong>Polaroid</strong>
+                <span>7 × 10 cm</span>
+            </div>
+
+            <div>
+                <strong>Photo</strong>
+                <span>5.5 × 7 cm</span>
+            </div>
+
+            <div>
+                <strong>Photos</strong>
+                <span id="photoCount">0</span>
+            </div>
+
+            <div>
+                <strong>Per Sheet</strong>
+                <span id="sheetCount">0</span>
+            </div>
+
+        </section>
+
+
+        <section class="preview-container">
+
             <div class="preview-header">
-                <h3>Print Preview</h3>
-                <span id="layoutInfo">A4 — 0 × 0 — 0 polaroids</span>
+                <h2>Print Preview</h2>
+                <span id="paperLabel">A4</span>
             </div>
-            <div class="preview-container">
-                <div id="paper"></div>
-            </div>
-        </aside>
-    </div>
+
+            <div id="paper"></div>
+
+        </section>
+
+    </main>
+
 
     <div id="cropModal" class="crop-modal">
+
         <div class="crop-modal-backdrop"></div>
+
         <div class="crop-modal-content">
+
             <div class="crop-modal-header">
                 <h3>Crop Photo</h3>
                 <button class="close-modal" id="closeCropModal">×</button>
             </div>
+
             <div class="crop-editor">
                 <div class="crop-frame" id="cropFrame">
                     <canvas id="cropCanvas"></canvas>
                     <div class="crop-overlay"></div>
                 </div>
             </div>
+
             <div class="crop-controls">
                 <div class="zoom-controls">
                     <button id="zoomOutBtn">−</button>
                     <button id="zoomResetBtn">Reset</button>
                     <button id="zoomInBtn">+</button>
                 </div>
+
                 <div class="rotate-controls">
-                    <button id="rotateLeftBtn" title="Rotate left">↺</button>
-                    <button id="rotateRightBtn" title="Rotate right">↻</button>
+                    <button id="rotateLeftBtn">↺</button>
+                    <button id="rotateRightBtn">↻</button>
                 </div>
+
                 <div class="crop-actions">
                     <button class="secondary" id="cancelCropBtn">Cancel</button>
                     <button id="applyCropBtn">Apply Crop</button>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div id="textModal" class="crop-modal">
-        <div class="crop-modal-backdrop"></div>
-        <div class="crop-modal-content">
-            <div class="crop-modal-header">
-                <h3>Edit Text</h3>
-                <button class="close-modal" id="closeTextModal">×</button>
-            </div>
-            <div class="text-form">
-                <div class="control-group">
-                    <label>Text</label>
-                    <input type="text" id="editPhotoText" placeholder="Enter text...">
-                </div>
-                <div class="control-group">
-                    <label>Font Size</label>
-                    <input type="number" id="editFontSize" value="16" min="8" max="72" step="1">
-                </div>
-                <div class="control-group">
-                    <label>Font</label>
-                    <select id="editFontFamily">
-                        <option value="Arial">Arial</option>
-                        <option value="Helvetica">Helvetica</option>
-                        <option value="Times New Roman">Times New Roman</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="Courier New">Courier New</option>
-                        <option value="Verdana">Verdana</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>Alignment</label>
-                    <select id="editTextAlign">
-                        <option value="center" selected>Center</option>
-                        <option value="left">Left</option>
-                        <option value="right">Right</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>Text Color</label>
-                    <input type="color" id="editTextColor" value="#000000">
-                </div>
-                <div class="crop-actions">
-                    <button class="secondary" id="cancelTextBtn">Cancel</button>
-                    <button id="applyTextBtn">Apply Text</button>
-                </div>
-            </div>
         </div>
+
     </div>
 
     <script src="script.js"></script>
+
 </body>
+
 </html>

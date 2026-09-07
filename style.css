@@ -379,8 +379,10 @@ button:hover,
     height: 7cm;
 
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 8px;
 
     opacity: 0;
     transition: opacity 0.2s ease;
@@ -414,6 +416,38 @@ button:hover,
 }
 
 .edit-crop-btn:hover {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.delete-photo-btn {
+    background: rgba(200, 40, 40, 0.85);
+    color: white;
+    border: 0;
+    border-radius: 8px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    pointer-events: auto;
+}
+
+.delete-photo-btn:hover {
+    background: rgba(220, 50, 50, 0.95);
+}
+
+.orient-btn {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: 0;
+    border-radius: 8px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    pointer-events: auto;
+}
+
+.orient-btn:hover {
     background: rgba(0, 0, 0, 0.9);
 }
 

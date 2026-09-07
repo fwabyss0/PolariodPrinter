@@ -139,7 +139,8 @@ photoInput.addEventListener("change", function () {
                     src: event.target.result,
                     name: file.name,
                     crop: null,
-                    cropped: null
+                    cropped: null,
+                    orientation: "portrait"
                 };
 
                 generateDefaultCrop(photo, img);
@@ -165,8 +166,9 @@ photoInput.addEventListener("change", function () {
 
 function generateDefaultCrop(photo, img) {
 
-    const cropFrameWidth = 275;
-    const cropFrameHeight = 350;
+    const portrait = photo.orientation === "portrait";
+    const cropFrameWidth = portrait ? 275 : 350;
+    const cropFrameHeight = portrait ? 350 : 275;
 
     const naturalWidth = img.naturalWidth;
     const naturalHeight = img.naturalHeight;
@@ -187,8 +189,9 @@ function generateDefaultCrop(photo, img) {
 
 function generateCroppedDataUrl(photo, img) {
 
-    const cropFrameWidth = 275;
-    const cropFrameHeight = 350;
+    const portrait = photo.orientation === "portrait";
+    const cropFrameWidth = portrait ? 275 : 350;
+    const cropFrameHeight = portrait ? 350 : 275;
 
     const crop = photo.crop;
 
@@ -198,8 +201,8 @@ function generateCroppedDataUrl(photo, img) {
     const sourceHeight = cropFrameHeight / crop.scale;
 
     const canvas = document.createElement("canvas");
-    canvas.width = 825;
-    canvas.height = 1050;
+    canvas.width = portrait ? 825 : 1050;
+    canvas.height = portrait ? 1050 : 825;
 
     const ctx = canvas.getContext("2d");
 
@@ -234,6 +237,16 @@ bgColorInput.addEventListener("input", render);
 /*
     Orientation helper
 */
+
+function getPhotoDimensions(photo) {
+    const portrait = photo.orientation === "portrait";
+    return {
+        width: portrait ? POLAROID_WIDTH : POLAROID_HEIGHT,
+        height: portrait ? POLAROID_HEIGHT : POLAROID_WIDTH,
+        photoWidth: portrait ? PHOTO_WIDTH : PHOTO_HEIGHT,
+        photoHeight: portrait ? PHOTO_HEIGHT : PHOTO_WIDTH
+    };
+}
 
 function getDimensions() {
     const portrait = orientationInput.value === "portrait";
@@ -285,7 +298,6 @@ function calculateLayout() {
 function render() {
 
     const selected = paperSizes[paperSize.value];
-    const dims = getDimensions();
 
     const copies = Math.max(
         1,
@@ -310,9 +322,9 @@ function render() {
     paper.style.background = getBgColor();
 
     paper.style.gridTemplateColumns =
-        `repeat(${layout.columns}, ${dims.width}cm)`;
+        `repeat(${layout.columns}, 7cm)`;
 
-    paper.style.gridAutoRows = `${dims.height}cm`;
+    paper.style.gridAutoRows = "10cm";
 
     paper.style.gap = `${spacing}cm`;
 
@@ -335,6 +347,8 @@ function render() {
             const polaroid = document.createElement("div");
             polaroid.className = "polaroid";
 
+            const dims = getPhotoDimensions(photo);
+
             const wrapper = document.createElement("div");
             wrapper.className = "photo-wrapper";
             wrapper.style.width = `${dims.photoWidth}cm`;
@@ -354,12 +368,24 @@ function render() {
             editBtn.textContent = "Edit Crop";
             editBtn.addEventListener("click", () => openCropEditor(photoIndex));
 
+            const deleteBtn = document.createElement("button");
+            deleteBtn.className = "delete-photo-btn";
+            deleteBtn.textContent = "Delete";
+            deleteBtn.addEventListener("click", () => deletePhoto(photoIndex));
+
+            const orientBtn = document.createElement("button");
+            orientBtn.className = "orient-btn";
+            orientBtn.textContent = photo.orientation === "portrait" ? "Landscape" : "Portrait";
+            orientBtn.addEventListener("click", () => togglePhotoOrientation(photoIndex));
+
             actions.appendChild(editBtn);
+            actions.appendChild(deleteBtn);
+            actions.appendChild(orientBtn);
             wrapper.appendChild(img);
             wrapper.appendChild(actions);
             polaroid.appendChild(wrapper);
 
-            if (orientationInput.value === "landscape") {
+            if (photo.orientation === "landscape") {
                 polaroid.classList.add("landscape");
             }
 
@@ -395,6 +421,35 @@ clearBtn.addEventListener("click", function () {
 });
 
 
+function deletePhoto(index) {
+
+    photos.splice(index, 1);
+    render();
+
+}
+
+
+function togglePhotoOrientation(index) {
+
+    const photo = photos[index];
+
+    if (photo.orientation === "portrait") {
+        photo.orientation = "landscape";
+    } else {
+        photo.orientation = "portrait";
+    }
+
+    const img = new Image();
+    img.src = photo.src;
+
+    img.onload = function () {
+        generateDefaultCrop(photo, img);
+        render();
+    };
+
+}
+
+
 /*
     Print
 */
@@ -428,8 +483,12 @@ function openCropEditor(photoIndex) {
 
     img.onload = function () {
 
-        const cropFrameWidth = 275;
-        const cropFrameHeight = 350;
+        const portrait = photo.orientation === "portrait";
+        const cropFrameWidth = portrait ? 275 : 350;
+        const cropFrameHeight = portrait ? 350 : 275;
+
+        cropFrame.style.width = cropFrameWidth + "px";
+        cropFrame.style.height = cropFrameHeight + "px";
 
         const naturalWidth = img.naturalWidth;
         const naturalHeight = img.naturalHeight;
@@ -528,8 +587,10 @@ function applyCrop() {
 
 function resetCrop() {
 
-    const cropFrameWidth = cropFrame.clientWidth;
-    const cropFrameHeight = cropFrame.clientHeight;
+    const portrait = currentCropPhotoIndex !== null &&
+        photos[currentCropPhotoIndex].orientation === "portrait";
+    const cropFrameWidth = portrait ? 275 : 350;
+    const cropFrameHeight = portrait ? 350 : 275;
 
     const naturalWidth = cropImage.naturalWidth;
     const naturalHeight = cropImage.naturalHeight;

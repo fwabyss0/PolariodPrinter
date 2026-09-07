@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polaroid Printer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <h1>Polaroid Printer</h1>
+    <p>Turn your photos into printable Polaroid sheets.</p>
+</header>
+
+<main>
+
+    <section class="controls">
+
+        <div class="control-group">
+            <label>Paper Size</label>
+
+            <select id="paperSize">
+                <option value="a4">A4 — 21 × 29.7 cm</option>
+                <option value="a3">A3 — 29.7 × 42 cm</option>
+                <option value="12x18">12 × 18 inch — 30.48 × 45.72 cm</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Polaroids Per Photo</label>
+
+            <input
+                type="number"
+                id="copies"
+                value="1"
+                min="1"
+                max="100"
+            >
+        </div>
+
+        <div class="control-group">
+            <label>Spacing</label>
+
+            <input
+                type="number"
+                id="spacing"
+                value="0.3"
+                min="0"
+                max="3"
+                step="0.1"
+            >
+
+            <span>cm</span>
+        </div>
+
+        <div class="control-group">
+            <label>Orientation</label>
+
+            <select id="orientation">
+                <option value="portrait">Portrait</option>
+                <option value="landscape">Landscape</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Background Color</label>
+
+            <div class="color-controls">
+                <input
+                    type="color"
+                    id="bgColor"
+                    value="#ffffff"
+                >
+
+                <div class="color-presets">
+                    <button class="preset" data-color="#ffffff" title="White">White</button>
+                    <button class="preset" data-color="#f5f0e6" title="Cream">Cream</button>
+                    <button class="preset" data-color="#000000" title="Black">Black</button>
+                    <button class="preset" data-color="#fce4ec" title="Light pink">Pink</button>
+                    <button class="preset" data-color="#e3f2fd" title="Light blue">Blue</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <label class="upload-btn">
+                📷 Upload Photos
+                <input
+                    type="file"
+                    id="photoInput"
+                    accept="image/*"
+                    multiple
+                    hidden
+                >
+            </label>
+
+            <button id="clearBtn">
+                Clear
+            </button>
+
+            <button id="printBtn">
+                🖨 Print
+            </button>
+        </div>
+
+    </section>
+
+
+    <section class="info">
+
+        <div>
+            <strong>Polaroid</strong>
+            <span>7 × 10 cm</span>
+        </div>
+
+        <div>
+            <strong>Photo</strong>
+            <span>5.5 × 7 cm</span>
+        </div>
+
+        <div>
+            <strong>Photos</strong>
+            <span id="photoCount">0</span>
+        </div>
+
+        <div>
+            <strong>Per Sheet</strong>
+            <span id="sheetCount">0</span>
+        </div>
+
+    </section>
+
+
+    <section class="preview-container">
+
+        <div class="preview-header">
+            <h2>Print Preview</h2>
+            <span id="paperLabel">A4</span>
+        </div>
+
+        <div id="paper"></div>
+
+    </section>
+
+</main>
+
+
+<div id="cropModal" class="crop-modal">
+
+    <div class="crop-modal-backdrop"></div>
+
+    <div class="crop-modal-content">
+
+        <div class="crop-modal-header">
+            <h3>Crop Photo</h3>
+            <button class="close-modal" id="closeCropModal">×</button>
+        </div>
+
+        <div class="crop-editor">
+            <div class="crop-frame" id="cropFrame">
+                <img id="cropImage" src="" alt="Crop preview" draggable="false">
+                <div class="crop-overlay"></div>
+            </div>
+        </div>
+
+        <div class="crop-controls">
+            <div class="zoom-controls">
+                <button id="zoomOutBtn">−</button>
+                <button id="zoomResetBtn">Reset</button>
+                <button id="zoomInBtn">+</button>
+            </div>
+
+            <div class="crop-actions">
+                <button class="secondary" id="cancelCropBtn">Cancel</button>
+                <button id="applyCropBtn">Apply Crop</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

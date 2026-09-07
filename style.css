@@ -556,18 +556,10 @@ button:hover,
     box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
 }
 
-.crop-frame img {
+.crop-frame canvas {
     position: absolute;
     top: 0;
     left: 0;
-
-    max-width: none;
-    max-height: none;
-
-    user-select: none;
-    -webkit-user-drag: none;
-
-    transform-origin: 0 0;
 }
 
 .crop-controls {

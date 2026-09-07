@@ -596,6 +596,18 @@ button:hover,
     font-size: 14px;
 }
 
+.rotate-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.rotate-controls button {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    font-weight: 700;
+}
+
 .crop-actions {
     display: flex;
     gap: 10px;

@@ -23,6 +23,8 @@ const applyCropBtn = document.getElementById("applyCropBtn");
 const zoomInBtn = document.getElementById("zoomInBtn");
 const zoomOutBtn = document.getElementById("zoomOutBtn");
 const zoomResetBtn = document.getElementById("zoomResetBtn");
+const rotateLeftBtn = document.getElementById("rotateLeftBtn");
+const rotateRightBtn = document.getElementById("rotateRightBtn");
 
 
 /*
@@ -68,6 +70,9 @@ const POLAROID_HEIGHT = 10;
 const PHOTO_WIDTH = 5.5;
 const PHOTO_HEIGHT = 7;
 
+const LANDSCAPE_PHOTO_WIDTH = 8;
+const LANDSCAPE_PHOTO_HEIGHT = 5;
+
 
 /*
     Store uploaded images
@@ -84,7 +89,8 @@ let currentCropPhotoIndex = null;
 let cropState = {
     x: 0,
     y: 0,
-    scale: 1
+    scale: 1,
+    rotation: 0
 };
 
 let isDragging = false;
@@ -167,8 +173,8 @@ photoInput.addEventListener("change", function () {
 function generateDefaultCrop(photo, img) {
 
     const portrait = photo.orientation === "portrait";
-    const cropFrameWidth = portrait ? 275 : 350;
-    const cropFrameHeight = portrait ? 350 : 275;
+    const cropFrameWidth = portrait ? 275 : 400;
+    const cropFrameHeight = portrait ? 350 : 250;
 
     const naturalWidth = img.naturalWidth;
     const naturalHeight = img.naturalHeight;
@@ -190,10 +196,11 @@ function generateDefaultCrop(photo, img) {
 function generateCroppedDataUrl(photo, img) {
 
     const portrait = photo.orientation === "portrait";
-    const cropFrameWidth = portrait ? 275 : 350;
-    const cropFrameHeight = portrait ? 350 : 275;
+    const cropFrameWidth = portrait ? 275 : 400;
+    const cropFrameHeight = portrait ? 350 : 250;
 
     const crop = photo.crop;
+    const rotation = crop.rotation || 0;
 
     const sourceX = -crop.x / crop.scale;
     const sourceY = -crop.y / crop.scale;
@@ -201,10 +208,24 @@ function generateCroppedDataUrl(photo, img) {
     const sourceHeight = cropFrameHeight / crop.scale;
 
     const canvas = document.createElement("canvas");
-    canvas.width = portrait ? 825 : 1050;
-    canvas.height = portrait ? 1050 : 825;
+    const outputWidth = portrait ? 825 : 1200;
+    const outputHeight = portrait ? 1050 : 750;
+    canvas.width = outputWidth;
+    canvas.height = outputHeight;
 
     const ctx = canvas.getContext("2d");
+
+    const radians = rotation * Math.PI / 180;
+    const sin = Math.abs(Math.sin(radians));
+    const cos = Math.abs(Math.cos(radians));
+
+    const rotatedWidth = sourceWidth * cos + sourceHeight * sin;
+    const rotatedHeight = sourceWidth * sin + sourceHeight * cos;
+
+    ctx.save();
+
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(radians);
 
     ctx.drawImage(
         img,
@@ -212,11 +233,13 @@ function generateCroppedDataUrl(photo, img) {
         sourceY,
         sourceWidth,
         sourceHeight,
-        0,
-        0,
-        canvas.width,
-        canvas.height
+        -sourceWidth / 2,
+        -sourceHeight / 2,
+        sourceWidth,
+        sourceHeight
     );
+
+    ctx.restore();
 
     photo.cropped = canvas.toDataURL("image/jpeg", 0.92);
 
@@ -243,8 +266,8 @@ function getPhotoDimensions(photo) {
     return {
         width: portrait ? POLAROID_WIDTH : POLAROID_HEIGHT,
         height: portrait ? POLAROID_HEIGHT : POLAROID_WIDTH,
-        photoWidth: portrait ? PHOTO_WIDTH : PHOTO_HEIGHT,
-        photoHeight: portrait ? PHOTO_HEIGHT : PHOTO_WIDTH
+        photoWidth: portrait ? PHOTO_WIDTH : LANDSCAPE_PHOTO_WIDTH,
+        photoHeight: portrait ? PHOTO_HEIGHT : LANDSCAPE_PHOTO_HEIGHT
     };
 }
 
@@ -265,18 +288,25 @@ function getDimensions() {
 function calculateLayout() {
 
     const selected = paperSizes[paperSize.value];
-    const dims = getDimensions();
-
     const spacing = Number(spacingInput.value) || 0;
+
+    let maxPolaroidWidth = POLAROID_WIDTH;
+    let maxPolaroidHeight = POLAROID_HEIGHT;
+
+    photos.forEach(photo => {
+        const dims = getPhotoDimensions(photo);
+        maxPolaroidWidth = Math.max(maxPolaroidWidth, dims.width);
+        maxPolaroidHeight = Math.max(maxPolaroidHeight, dims.height);
+    });
 
     let columns = Math.floor(
         (selected.width + spacing) /
-        (dims.width + spacing)
+        (maxPolaroidWidth + spacing)
     );
 
     let rows = Math.floor(
         (selected.height + spacing) /
-        (dims.height + spacing)
+        (maxPolaroidHeight + spacing)
     );
 
     const normalCount = columns * rows;
@@ -484,8 +514,8 @@ function openCropEditor(photoIndex) {
     img.onload = function () {
 
         const portrait = photo.orientation === "portrait";
-        const cropFrameWidth = portrait ? 275 : 350;
-        const cropFrameHeight = portrait ? 350 : 275;
+        const cropFrameWidth = portrait ? 275 : 400;
+        const cropFrameHeight = portrait ? 350 : 250;
 
         cropFrame.style.width = cropFrameWidth + "px";
         cropFrame.style.height = cropFrameHeight + "px";
@@ -504,12 +534,18 @@ function openCropEditor(photoIndex) {
             crop = {
                 x: (cropFrameWidth - naturalWidth * minScale) / 2,
                 y: (cropFrameHeight - naturalHeight * minScale) / 2,
-                scale: minScale
+                scale: minScale,
+                rotation: 0
             };
             photo.crop = crop;
         }
 
-        cropState = { ...crop };
+        cropState = {
+            x: crop.x,
+            y: crop.y,
+            scale: crop.scale,
+            rotation: crop.rotation || 0
+        };
 
         updateCropTransform();
 
@@ -531,7 +567,7 @@ function closeCropEditor() {
 function updateCropTransform() {
 
     cropImage.style.transform =
-        `translate(${cropState.x}px, ${cropState.y}px) scale(${cropState.scale})`;
+        `translate(${cropState.x}px, ${cropState.y}px) scale(${cropState.scale}) rotate(${cropState.rotation}deg)`;
 
 }
 
@@ -571,7 +607,12 @@ function applyCrop() {
     constrainCrop();
 
     const photo = photos[currentCropPhotoIndex];
-    photo.crop = { ...cropState };
+    photo.crop = {
+        x: cropState.x,
+        y: cropState.y,
+        scale: cropState.scale,
+        rotation: cropState.rotation
+    };
 
     const img = new Image();
     img.src = photo.src;
@@ -589,8 +630,8 @@ function resetCrop() {
 
     const portrait = currentCropPhotoIndex !== null &&
         photos[currentCropPhotoIndex].orientation === "portrait";
-    const cropFrameWidth = portrait ? 275 : 350;
-    const cropFrameHeight = portrait ? 350 : 275;
+    const cropFrameWidth = portrait ? 275 : 400;
+    const cropFrameHeight = portrait ? 350 : 250;
 
     const naturalWidth = cropImage.naturalWidth;
     const naturalHeight = cropImage.naturalHeight;
@@ -798,6 +839,69 @@ zoomOutBtn.addEventListener("click", function () {
 
 
 zoomResetBtn.addEventListener("click", resetCrop);
+
+rotateLeftBtn.addEventListener("click", function () {
+    rotateImage(-90);
+});
+
+rotateRightBtn.addEventListener("click", function () {
+    rotateImage(90);
+});
+
+function rotateImage(degrees) {
+
+    const portrait = currentCropPhotoIndex !== null &&
+        photos[currentCropPhotoIndex].orientation === "portrait";
+
+    const cropFrameWidth = portrait ? 275 : 400;
+    const cropFrameHeight = portrait ? 350 : 250;
+
+    const naturalWidth = cropImage.naturalWidth;
+    const naturalHeight = cropImage.naturalHeight;
+
+    if (!naturalWidth || !naturalHeight) return;
+
+    const oldRotation = cropState.rotation || 0;
+    const newRotation = (oldRotation + degrees) % 360;
+
+    const oldRadians = oldRotation * Math.PI / 180;
+    const newRadians = newRotation * Math.PI / 180;
+
+    const oldCos = Math.abs(Math.cos(oldRadians));
+    const oldSin = Math.abs(Math.sin(oldRadians));
+    const newCos = Math.abs(Math.cos(newRadians));
+    const newSin = Math.abs(Math.sin(newRadians));
+
+    const oldEffectiveWidth = naturalWidth * oldCos + naturalHeight * oldSin;
+    const oldEffectiveHeight = naturalWidth * oldSin + naturalHeight * oldCos;
+
+    const newEffectiveWidth = naturalWidth * newCos + naturalHeight * newSin;
+    const newEffectiveHeight = naturalWidth * newSin + naturalHeight * newCos;
+
+    const oldScale = cropState.scale;
+    const oldDisplayWidth = oldEffectiveWidth * oldScale;
+    const oldDisplayHeight = oldEffectiveHeight * oldScale;
+
+    const centerX = cropState.x + oldDisplayWidth / 2;
+    const centerY = cropState.y + oldDisplayHeight / 2;
+
+    const newScale = Math.max(
+        cropFrameWidth / newEffectiveWidth,
+        cropFrameHeight / newEffectiveHeight
+    );
+
+    const newDisplayWidth = newEffectiveWidth * newScale;
+    const newDisplayHeight = newEffectiveHeight * newScale;
+
+    cropState.rotation = newRotation;
+    cropState.scale = newScale;
+    cropState.x = centerX - newDisplayWidth / 2;
+    cropState.y = centerY - newDisplayHeight / 2;
+
+    constrainCrop();
+    updateCropTransform();
+
+}
 
 
 /*
